@@ -1,0 +1,24 @@
+version: "0.1"
+name: {{ name }}
+category: {{ category }}
+author: {{ author }}
+description: |
+  {{ description | indent(width=2) }}
+
+flags:
+  - type: static
+    content: {{ flag }}
+    data: case_insensitive
+
+type: dynamic
+extra:
+  initial: 500
+  decay: 4
+  function: linear
+  minimum: 100
+
+image: {{ image }}
+protocol: {{ protocol }}
+
+# files:
+#   -

@@ -1,0 +1,122 @@
+$schema: http://json-schema.org/draft-04/schema
+title: ctfcli challenge v0.1
+description: Based on https://github.com/CTFd/ctfcli/blob/master/ctfcli/spec/challenge-example.yml
+type: object
+required:
+- name
+- author
+- category
+- description
+- flags
+properties:
+  version:
+    const: "0.1"
+  name:
+    type: string
+  author:
+    type: string
+  category:
+    type: string
+  description:
+    type: string
+  value:
+    type: integer
+    minimum: 0
+    default: 500
+  type:
+    type: string
+    default: standard
+
+  extra:
+    type: object
+    properties:
+      initial:
+        type: integer
+        minimum: 0
+        default: 500
+      decay:
+        type: integer
+        minimum: 1
+        default: 4
+      function:
+        type: string
+        enum:
+        - linear
+        - exponential
+        default: linear
+      minimum:
+        type: integer
+        minimum: 0
+        default: 100
+
+  image:
+    type: string
+  protocol:
+    type: string
+  host:
+    type: string
+
+  connection_info:
+    type: string
+  healthcheck:
+    type: string
+  attempts:
+    type: integer
+    minimum: 1
+
+  flags:
+    type: array
+    items:
+      oneOf:
+      - type: string
+      - type: object
+        properties:
+          type:
+            type: string
+            enum:
+            - static
+          content:
+            type: string
+          data:
+            type: string
+            enum:
+            - case_insensitive
+
+  topics:
+    type: array
+    items:
+      type: string
+  tags:
+    type: array
+    items:
+      type: string
+
+  files:
+    type: array
+    items:
+      type: string
+
+  hints:
+    type: array
+    items:
+      oneOf:
+      - type: string
+      - type: object
+        properties:
+          content:
+            type: string
+          cost:
+            type: integer
+            minimum: 0
+
+  requirements:
+    type: array
+    items:
+      type: string
+
+  state:
+    type: string
+    enum:
+    - hidden
+    - visible
+    default: visible

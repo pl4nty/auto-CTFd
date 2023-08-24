@@ -1,0 +1,70 @@
+name: Create challenge from issue
+
+on:
+  issues:
+    types:
+      - opened
+
+jobs:
+  process:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3.5.3
+      - uses: zentered/issue-forms-body-parser@v2.1.4
+        id: form
+
+      - name: Slugify challenge name
+        id: slugify
+        uses: rlespinasse/slugify-value@v1.4.0
+        with:
+          key: title
+          value: ${{ github.event.issue.title }}
+
+      - name: Make challenge directory and metadata
+        id: chal
+        run: |
+          directory="${{ env.category }}/${{ steps.slugify.outputs.slug }}"
+          mkdir -p $directory
+          echo "directory=$directory" >> $GITHUB_OUTPUT
+          echo "category=${{ env.category }}" >> $GITHUB_OUTPUT
+        env:
+          category: ${{ fromJSON(steps.form.outputs.data).category.text }}
+
+      - name: Create writeup
+        run: echo "${{ fromJSON(steps.form.outputs.data).writeup.text }}" > ${{ steps.chal.outputs.directory }}/README.md
+
+      - name: Parse issue form to jinja2 data file
+        run: echo '${{ steps.form.outputs.data }}' | jq 'with_entries(.value = .value.text)' > data.json
+
+      - name: Render challenge.yml
+        uses: cuchi/jinja2-action@v1.2.0
+        with:
+          template: .github/challenge-template.yml
+          output_file: ${{ steps.chal.outputs.directory }}/challenge.yml
+          data_file: data.json
+          data_format: json # autodetects as yaml, despite docs stating it's extension-based
+          # Default to HTTPS protocol for web challenges
+          variables: |
+            name=${{ github.event.issue.title }}
+            protocol=${{ fromJSON(steps.form.outputs.data).writeup.text == 'web' && 'https' || 'tcp' }}
+      - run: rm data.json
+
+      - uses: peter-evans/create-pull-request@v5.0.2
+        with:
+          branch: patch-${{ github.event.issue.number }}
+          title: ${{ env.title }}
+          body: "Closes #${{ github.event.issue.number }}"
+          commit-message: ${{ env.title }}
+        env:
+          title: "chals(${{ steps.chal.outputs.category }}): add ${{ steps.slugify.outputs.slug }}"
+
+      - uses: peter-evans/create-or-update-comment@v3.0.2
+        with:
+          issue-number: ${{ github.event.issue.number }}
+          body: |
+            [Click here to upload challenge files](${{ format('{0}/{1}/upload/patch-{2}/{3}',
+              github.server_url,
+              github.repository,
+              github.event.issue.number,
+              steps.chal.outputs.directory
+            )}})

@@ -1,0 +1,96 @@
+name: Deploy containers
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+    filter:
+      type: string
+      description: Glob pattern for target challenges
+      required: true
+      default: '*/*/'
+
+jobs:
+  get-chals:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      challenges: ${{ github.event_name == 'workflow_dispatch' && inputs.filter || steps.changed-files.outputs.all_changed_and_modified_files }}
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+
+    - name: Get changed files
+      uses: tj-actions/changed-files@v35
+      id: changed-files
+      with:
+        dir_names: true # output folders instead of files
+        dir_names_max_depth: 2 # only return challenge root, not subfolders
+
+  deploy:
+    needs: get-chals
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: 3.x
+
+      - name: Setup ctfcli
+        run: pip install git+https://github.com/CTFd/ctfcli # ctfcli==0.0.14
+
+      - name: Load CTFd credentials
+        run: |
+          mkdir .ctf
+          cat <<EOF > .ctf/config
+          [config]
+          url = https://${{ vars.CTFD_DOMAIN }}
+          access_token = ${{ secrets.CTFD_TOKEN }}
+
+          [cookies]
+          site_password = ${{ secrets.CTFD_SITE_PASSWORD }}
+
+          [challenges]
+          EOF
+
+      - name: Setup Docker cache
+        uses: jpribyl/action-docker-layer-caching@v0.1.1
+        with:
+          key: docker-layer-cache-{hash}
+          restore-keys: |
+            docker-layer-cache-
+            layer-docker-layer-cache-
+
+      # TODO use 'ctf' once fixed
+      - name: Deploy containers
+        run: |
+          for chal in ${{ needs.get-chals.outputs.challenges }}; do
+            python -m ctfcli challenge deploy $chal
+          done
+
+      - name: Login to GitHub container registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
+
+      - name: Push images to GitHub
+        run: |-
+          images=$(docker images $CTFD_REGISTRY/*:latest --format "{{.Repository}}")
+          for image in $images; do
+            lowercase=${GITHUB_REPOSITORY_OWNER,,}
+            newtag=${image//$CTFD_REGISTRY/ghcr\.io\/$lowercase}:latest
+            docker tag $image:latest $newtag
+            docker push $newtag
+          done
+        env:
+          CTFD_REGISTRY: ${{ vars.CTFD_REGISTRY }}
