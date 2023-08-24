@@ -21,13 +21,13 @@ jobs:
     outputs:
       challenges: ${{ github.event_name == 'workflow_dispatch' && inputs.filter || steps.changed-files.outputs.all_changed_and_modified_files }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v3.5.3
         with:
           fetch-depth: 0
 
       - name: Get changed files
         id: changed-files
-        uses: tj-actions/changed-files@v35
+        uses: tj-actions/changed-files@v38.1.0
         with:
           files: "**/challenge.yml"
 
@@ -40,13 +40,13 @@ jobs:
     steps:
       # https://github.com/actions/checkout/issues/165#issuecomment-1639209867
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v3.5.3
 
       - name: Create LFS file list
         run: git lfs ls-files --long | cut -d ' ' -f1 | sort > .lfs-assets-id
 
       - name: Restore LFS cache
-        uses: actions/cache@v3
+        uses: actions/cache@v3.3.1
         with:
           path: .git/lfs/objects
           key: ${{ runner.os }}-lfs-${{ hashFiles('.lfs-assets-id') }}
@@ -55,7 +55,7 @@ jobs:
 
       - run: git lfs pull
 
-      - uses: actions/setup-python@v4
+      - uses: actions/setup-python@v4.7.0
         with:
           python-version: 3.x
 
