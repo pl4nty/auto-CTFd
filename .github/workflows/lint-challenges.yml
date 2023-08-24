@@ -24,7 +24,7 @@ jobs:
     outputs:
       challenges: ${{ github.event_name == 'workflow_dispatch' && inputs.filter || steps.changed-files.outputs.all_changed_and_modified_files }}
     steps:
-      - uses: actions/checkout@v3.5.3
+      - uses: actions/checkout@v3.6.0
         with:
           fetch-depth: 0
 
@@ -43,7 +43,7 @@ jobs:
     steps:
       # https://github.com/actions/checkout/issues/165#issuecomment-1639209867
       - name: Checkout
-        uses: actions/checkout@v3.5.3
+        uses: actions/checkout@v3.6.0
 
       - uses: actions/setup-python@v4.7.0
         with:
