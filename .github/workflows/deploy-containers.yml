@@ -4,6 +4,10 @@ on:
   push:
     branches:
       - main
+    paths-ignore:
+      - "*.*"
+      - ".*/**"
+      - pages/
   workflow_dispatch:
     filter:
       type: string
