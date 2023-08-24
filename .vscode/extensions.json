@@ -1,0 +1,7 @@
+{
+  "recommendations": [
+    "EditorConfig.EditorConfig",
+    "ms-azuretools.vscode-docker",
+    "redhat.vscode-yaml"
+  ]
+}

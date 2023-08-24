@@ -1,0 +1,84 @@
+name: Deploy challenges
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "**/challenge.yml"
+  workflow_dispatch:
+    filter:
+      type: string
+      description: Glob pattern for target challenges
+      required: true
+      default: '**/challenge.yml'
+
+jobs:
+  get-chals:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      challenges: ${{ github.event_name == 'workflow_dispatch' && ${{ inputs.filter }} || steps.changed-files.outputs.all_changed_and_modified_files }}
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v35
+        with:
+          files: "**/challenge.yml"
+
+  deploy:
+    needs: get-chals
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      # https://github.com/actions/checkout/issues/165#issuecomment-1639209867
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Create LFS file list
+        run: git lfs ls-files --long | cut -d ' ' -f1 | sort > .lfs-assets-id
+
+      - name: Restore LFS cache
+        uses: actions/cache@v3
+        with:
+          path: .git/lfs/objects
+          key: ${{ runner.os }}-lfs-${{ hashFiles('.lfs-assets-id') }}
+          restore-keys: |
+            ${{ runner.os }}-lfs-
+
+      - run: git lfs pull
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: 3.x
+
+      - name: Setup ctfcli
+        run: pip install git+https://github.com/CTFd/ctfcli # ctfcli==0.0.14
+
+      - name: Load CTFd credentials
+        run: |
+          mkdir .ctf
+          cat <<EOF > .ctf/config
+          [config]
+          url = https://${{ vars.CTFD_DOMAIN }}
+          access_token = ${{ secrets.CTFD_TOKEN }}
+
+          [cookies]
+          site_password = ${{ secrets.CTFD_SITE_PASSWORD }}
+
+          [challenges]
+          EOF
+
+      # TODO use 'ctf' once fixed
+      - name: Deploy challenges
+        run: |
+          for chal in ${{ needs.get-chals.outputs.challenges }}; do
+            python -m ctfcli challenge install $chal --force
+          done

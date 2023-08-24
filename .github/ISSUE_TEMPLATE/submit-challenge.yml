@@ -1,0 +1,52 @@
+name: Challenge
+description: Create a new challenge
+title: Add your challenge name here
+body:
+  - type: dropdown
+    attributes:
+      label: Category
+      options:
+        - crypto
+        - forensics
+        - misc
+        - osint
+        - pwn
+        - rev
+        - steg
+        - web
+    # required fields are only supported on public repos
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: Author
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Description
+      placeholder: Add a short description for players to see
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: Flag
+      value: ctf{your_flag_here}
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: Image
+      description: The Dockerfile path for challenge containers (eg pwn or web)
+      placeholder: .
+  - type: textarea
+    attributes:
+      label: Writeup
+      placeholder: Describe the intended solution to your challenge here
+    validations:
+      required: true
+  - type: checkboxes
+    attributes:
+      label: Publishing
+      options:
+        - label: Can the challenge and its writeup be released publicly after the CTF?
