@@ -25,6 +25,7 @@ Automatically deploy your CTF challenges from GitHub to CTFd.
 | ---- | ----- |
 | `CTFD_DOMAIN` | [CTFd domain](https://docs.ctfd.io/hosted/management/setting-custom-domains), eg `pecan.ctfd.io` |
 | `CTFD_REGISTRY` | [CTFd challenge registry](https://docs.ctfd.io/tutorials/challenges/deploying-challenges), eg `registry.ctfd.io/pecan` |
+| `FLAG_PREFIX` (optional) | Flag prefix for linting, eg `ctf{` |
 
 ## Usage
 

@@ -70,5 +70,5 @@ jobs:
       - name: Lint challenges
         run: |
           for chal in ${{ needs.get-chals.outputs.challenges }}; do
-            python -m ctfcli challenge lint $chal
+            python -m ctfcli challenge lint $chal --flag_format=${{ vars.FLAG_PREFIX || 'ctf{' }}}
           done
