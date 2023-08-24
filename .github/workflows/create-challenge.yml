@@ -37,7 +37,7 @@ jobs:
         run: echo '${{ steps.form.outputs.data }}' | jq 'with_entries(.value = .value.text)' > data.json
 
       - name: Render challenge.yml
-        uses: cuchi/jinja2-action@v1.2.0
+        uses: cuchi/jinja2-action@v1.2.1
         with:
           template: .github/challenge-template.yml
           output_file: ${{ steps.chal.outputs.directory }}/challenge.yml
