@@ -76,6 +76,7 @@ jobs:
       # TODO use 'ctf' once fixed
       - name: Deploy containers
         run: |
+          shopt -s globstar
           for chal in ${{ needs.get-chals.outputs.challenges }}; do
             python -m ctfcli challenge deploy $chal
           done
