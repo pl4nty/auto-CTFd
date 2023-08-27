@@ -10,6 +10,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3.6.0
+      - uses: actions/setup-python@v4.7.0
+        with:
+          python-version: 3.x
+
       - uses: zentered/issue-forms-body-parser@v2.1.4
         id: form
 
@@ -41,17 +45,14 @@ jobs:
           data: ${{ steps.form.outputs.data }}
 
       - name: Render challenge.yml
-        uses: cuchi/jinja2-action@v1.2.1
-        with:
-          template: .github/challenge-template.jinja2
-          output_file: ${{ steps.chal.outputs.directory }}/challenge.yml
-          data_file: data.json
-          data_format: json # autodetects as yaml, despite docs stating it's extension-based
-          # Default to HTTPS protocol for web challenges
-          variables: |
-            name=${{ github.event.issue.title }}
-            protocol=${{ fromJSON(steps.form.outputs.data).writeup.text == 'web' && 'https' || 'tcp' }}
-      - run: rm data.json
+        run: |
+          pip install jinja2-cli
+          jinja2 .github/challenge-template.jinja2 data.json \
+          --outfile ${{ steps.chal.outputs.directory }}/challenge.yml \
+          -D name=${{ github.event.issue.title }} \
+          -D protocol=${{ fromJSON(steps.form.outputs.data).writeup.text == 'web' && 'https' || 'tcp' }}
+
+          rm data.json
 
       - uses: peter-evans/create-pull-request@v5.0.2
         with:
