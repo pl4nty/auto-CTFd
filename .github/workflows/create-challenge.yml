@@ -48,9 +48,8 @@ jobs:
         run: |
           pip install jinja2-cli
           jinja2 .github/challenge-template.jinja2 data.json \
-          --outfile ${{ steps.chal.outputs.directory }}/challenge.yml \
-          -D name="${{ github.event.issue.title }}" \
-          -D protocol=${{ steps.chal.outputs.category == 'web' && 'https' || 'tcp' }}
+          --outfile "${{ steps.chal.outputs.directory }}/challenge.yml" \
+          -D name="${{ github.event.issue.title }}"
 
           rm data.json
 

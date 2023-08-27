@@ -21,5 +21,5 @@ extra:
   function: linear
   minimum: 100
 
-image: {{ image }}
-protocol: {{ protocol }}
+image: {{ image if image != '*No response*' else 'null' }}
+protocol: {{ 'https' if category == 'web' else 'tcp' }}
