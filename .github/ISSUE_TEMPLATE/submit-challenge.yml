@@ -30,6 +30,13 @@ body:
       required: true
   - type: input
     attributes:
+      label: Files
+      description: List of files or folders for players to download
+      placeholder: file.txt,folder
+    validations:
+      required: true
+  - type: input
+    attributes:
       label: Flag
       value: ctf{your_flag_here}
     validations:
@@ -42,7 +49,7 @@ body:
   - type: textarea
     attributes:
       label: Writeup
-      placeholder: Describe the intended solution to your challenge here
+      placeholder: Describe the intended solution to your challenge here. Avoid using markdown subtitles (##)
     validations:
       required: true
   - type: checkboxes

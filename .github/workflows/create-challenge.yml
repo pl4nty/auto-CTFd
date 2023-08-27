@@ -39,7 +39,7 @@ jobs:
       - name: Render challenge.yml
         uses: cuchi/jinja2-action@v1.2.1
         with:
-          template: .github/challenge-template.yml
+          template: .github/challenge-template.jinja2
           output_file: ${{ steps.chal.outputs.directory }}/challenge.yml
           data_file: data.json
           data_format: json # autodetects as yaml, despite docs stating it's extension-based
