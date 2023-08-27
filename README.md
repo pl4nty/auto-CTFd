@@ -34,6 +34,17 @@ Automatically deploy your CTF challenges from GitHub to CTFd.
 * Consider using [GitHub Codespaces](https://github.com/features/codespaces) for challenge development
 * Add [CTFd pages](https://docs.ctfd.io/docs/management/ctfcli/pages) to the `pages` folder, and they'll automatically be deployed
 
+## Updating
+
+Get the latest updates with the following commands. You may need to resolve merge conflicts.
+
+```
+git remote add template https://github.com/pl4nty/auto-CTFd
+git fetch template main
+git merge template/main --allow-unrelated-histories --squash
+git push
+```
+
 ## Containers
 
 Some challenges, like pwn or web, may wish to run services in containers. These have certain requirements and limitations. Please see the [CTFd documentation](https://docs.ctfd.io/tutorials/challenges/deploying-challenges) for more details.
