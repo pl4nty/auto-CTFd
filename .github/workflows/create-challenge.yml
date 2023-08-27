@@ -31,10 +31,14 @@ jobs:
           category: ${{ fromJSON(steps.form.outputs.data).category.text }}
 
       - name: Create writeup
-        run: echo "${{ fromJSON(steps.form.outputs.data).writeup.text }}" > ${{ steps.chal.outputs.directory }}/README.md
+        run: printf "%s" "$data" > ${{ steps.chal.outputs.directory }}/README.md
+        env:
+          data: ${{ fromJSON(steps.form.outputs.data).writeup.text }}
 
       - name: Parse issue form to jinja2 data file
-        run: echo '${{ steps.form.outputs.data }}' | jq 'with_entries(.value = .value.text)' > data.json
+        run: printf "%s" "$data" | jq 'with_entries(.value = .value.text)' > data.json
+        env:
+          data: ${{ steps.form.outputs.data }}
 
       - name: Render challenge.yml
         uses: cuchi/jinja2-action@v1.2.1
