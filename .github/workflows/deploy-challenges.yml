@@ -60,7 +60,7 @@ jobs:
           python-version: 3.x
 
       - name: Setup ctfcli
-        run: pip install git+https://github.com/CTFd/ctfcli # ctfcli==0.0.14
+        run: pip install git+https://github.com/CTFd/ctfcli # ctfcli==0.1.0
 
       - name: Load CTFd credentials
         run: |
@@ -76,10 +76,9 @@ jobs:
           [challenges]
           EOF
 
-      # TODO use 'ctf' once fixed
       - name: Deploy challenges
         run: |
           shopt -s globstar
           for chal in ${{ needs.get-chals.outputs.challenges }}; do
-            python -m ctfcli challenge install $chal --force
+            ctf challenge install $chal --force
           done

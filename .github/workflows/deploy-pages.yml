@@ -21,7 +21,7 @@ jobs:
           python-version: 3.x
 
       - name: Setup ctfcli
-        run: pip install git+https://github.com/CTFd/ctfcli # ctfcli==0.0.14
+        run: pip install git+https://github.com/CTFd/ctfcli # ctfcli==0.1.0
 
       - name: Load CTFd credentials
         run: |
@@ -37,6 +37,5 @@ jobs:
           [challenges]
           EOF
 
-      # TODO use 'ctf' once fixed
       - name: Deploy pages
-        run: python -m ctfcli pages sync
+        run: ctf pages sync
