@@ -8,7 +8,14 @@
   "ignoreTests": true,
   "packageRules": [
     {
+      "matchManagers": ["github-actions"],
       "matchUpdateTypes": ["minor", "patch"],
+      "matchCurrentVersion": "!/^0/",
+      "automerge": true
+    },
+    {
+      "fileMatch": [".github/requirements.txt"],
+      "matchUpdateTypes": ["patch"],
       "matchCurrentVersion": "!/^0/",
       "automerge": true
     }
