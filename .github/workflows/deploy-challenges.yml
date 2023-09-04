@@ -27,7 +27,7 @@ jobs:
 
       - name: Get changed files
         id: changed-files
-        uses: tj-actions/changed-files@v38.2.2
+        uses: tj-actions/changed-files@v39.0.0
         with:
           files: "**/challenge.yml"
 
