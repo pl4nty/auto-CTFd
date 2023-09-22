@@ -28,7 +28,7 @@ jobs:
         fetch-depth: 0
 
     - name: Get changed files
-      uses: tj-actions/changed-files@v39.1.2
+      uses: tj-actions/changed-files@v39.2.0
       id: changed-files
       with:
         dir_names: true # output folders instead of files
