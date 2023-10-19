@@ -62,7 +62,7 @@ jobs:
         env:
           title: "chals(${{ steps.chal.outputs.category }}): add ${{ steps.slugify.outputs.slug }}"
 
-      - uses: peter-evans/create-or-update-comment@v3.0.2
+      - uses: peter-evans/create-or-update-comment@v3.1.0
         with:
           issue-number: ${{ github.event.issue.number }}
           body: |
