@@ -41,7 +41,7 @@ Get the latest updates with the following commands. You may need to resolve merg
 ```
 git remote add template https://github.com/pl4nty/auto-CTFd
 git fetch template main
-git merge template/main --allow-unrelated-histories --squash
+git merge template/main --allow-unrelated-histories --squash -X theirs
 git push
 ```
 
