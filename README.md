@@ -10,8 +10,8 @@ Automatically deploy your CTF challenges from GitHub to CTFd.
 
 ## Getting Started
 
-1. [Click here](https://github.com/new?template_name=auto-ctfd&template_owner=pl4nty) to create a repository for your CTF
-2. Select "Private" to prevent public access
+1. [Click here](https://github.com/new?template_name=auto-ctfd&template_owner=pl4nty) to create a repository for your CTF. Select "Private" to prevent public access
+2. [Allow GitHub Actions to create pull requests](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/enabling-features-for-your-repository/managing-github-actions-settings-for-a-repository#preventing-github-actions-from-creating-or-approving-pull-requests)
 3. [Create the following secrets](https://docs.github.com/en/actions/security-guides/encrypted-secrets#creating-encrypted-secrets-for-a-repository):
 
 | Name | Value |
