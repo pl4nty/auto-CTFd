@@ -39,9 +39,8 @@ Automatically deploy your CTF challenges from GitHub to CTFd.
 Get the latest updates with the following commands. You may need to resolve merge conflicts.
 
 ```
-git remote add template https://github.com/pl4nty/auto-CTFd
-git fetch template main
-git merge template/main --allow-unrelated-histories --squash -X theirs
+git pull https://github.com/pl4nty/auto-CTFd --allow-unrelated-histories --rebase=false --squash -X theirs
+git commit -m "chore: update repo template"
 git push
 ```
 
