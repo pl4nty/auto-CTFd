@@ -33,8 +33,6 @@ body:
       label: Files
       description: List of files or folders for players to download
       placeholder: file.txt,folder
-    validations:
-      required: true
   - type: input
     attributes:
       label: Flag

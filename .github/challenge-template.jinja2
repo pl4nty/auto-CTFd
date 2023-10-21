@@ -5,9 +5,11 @@ author: {{ author }}
 description: |
   {{ description | indent(width=2) }}
 
+{% if filelist != '*No response*' %}
 {% set filelist = files.split(',') %}
 files:
   - {{ filelist | join('\n  - ') }}
+{% endif %}
 
 flags:
   - type: static
@@ -21,5 +23,7 @@ extra:
   function: linear
   minimum: 100
 
-image: {{ image if image != '*No response*' else 'null' }}
+{% if image != '*No response*' %}
+image: {{ image }}
 protocol: {{ 'https' if category == 'web' else 'tcp' }}
+{% endif %}
