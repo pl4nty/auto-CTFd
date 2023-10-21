@@ -21,7 +21,7 @@ jobs:
           python-version: 3.x
 
       - name: Setup ctfcli
-        run: pip install git+https://github.com/CTFd/ctfcli # ctfcli==0.1.0
+        run: pip install ctfcli==0.1.0
 
       - name: Load CTFd credentials
         run: |
