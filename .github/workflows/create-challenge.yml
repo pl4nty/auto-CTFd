@@ -18,7 +18,7 @@ jobs:
         with:
           python-version: 3.x
 
-      - uses: zentered/issue-forms-body-parser@v2.1.4
+      - uses: zentered/issue-forms-body-parser@v2.1.5
         id: form
 
       - name: Slugify challenge name
