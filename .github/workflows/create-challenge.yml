@@ -57,7 +57,7 @@ jobs:
 
           rm data.json
 
-      - uses: peter-evans/create-pull-request@v5.0.2
+      - uses: peter-evans/create-pull-request@v6.0.0
         with:
           branch: patch-${{ github.event.issue.number }}
           title: ${{ env.title }}
