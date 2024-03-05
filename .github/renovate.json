@@ -1,16 +1,14 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
-    "config:base",
-    ":disableRateLimiting"
+    "config:best-practices"
   ],
   "additionalBranchPrefix": "{{parentDir}}-",
-  "rangeStrategy": "pin",
   "ignoreTests": true,
   "packageRules": [
     {
       "matchManagers": ["github-actions"],
-      "matchUpdateTypes": ["minor", "patch"],
+      "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
       "matchCurrentVersion": "!/^0/",
       "automerge": true
     }

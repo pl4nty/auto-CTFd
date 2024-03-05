@@ -1,22 +1,10 @@
-version: "0.1"
 name: {{ name }}
-category: {{ category }}
 author: {{ author }}
-description: |
+category: {{ category }}
+description: >-
   {{ description | indent(width=2) }}
-
-{% if files != '*No response*' %}
-{% set filelist = files.split(',') %}
-files:
-  - {{ filelist | join('\n  - ') }}
-{% endif %}
-
-flags:
-  - type: static
-    content: {{ flag }}
-    data: case_insensitive
-
 type: dynamic
+
 extra:
   initial: 500
   decay: 4
@@ -26,4 +14,17 @@ extra:
 {% if image != '*No response*' %}
 image: {{ image }}
 protocol: {{ 'https' if category == 'web' else 'tcp' }}
+
 {% endif %}
+flags:
+- type: static
+  data: case_insensitive
+  content: {{ flag }}
+
+{% if files != '*No response*' %}
+{% set filelist = files.split(',') %}
+files:
+  - {{ filelist | join('\n  - ') }}
+
+{% endif %}
+version: "0.1"

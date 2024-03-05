@@ -1,3 +1,2 @@
 .ctf/
-.secrets
-.vars
+.devcontainer/

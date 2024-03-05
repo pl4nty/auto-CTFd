@@ -1,4 +1,4 @@
-name: Create challenge from issue
+name: Create challenge from issue form
 
 on:
   issues:
@@ -6,7 +6,7 @@ on:
       - opened
 
 jobs:
-  process:
+  main:
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write
@@ -14,9 +14,11 @@ jobs:
       issues: write
     steps:
       - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+
       - uses: actions/setup-python@v5.0.0
         with:
           python-version: 3.x
+          cache: pip
 
       - uses: zentered/issue-forms-body-parser@v2.2.0
         id: form
@@ -54,7 +56,6 @@ jobs:
           jinja2 .github/challenge-template.jinja2 data.json \
           --outfile "${{ steps.chal.outputs.directory }}/challenge.yml" \
           -D name="${{ github.event.issue.title }}"
-
           rm data.json
 
       - uses: peter-evans/create-pull-request@v6.0.1

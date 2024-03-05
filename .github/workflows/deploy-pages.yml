@@ -9,7 +9,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  deploy:
+  main:
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -19,12 +19,11 @@ jobs:
       - uses: actions/setup-python@v5.0.0
         with:
           python-version: 3.x
+          cache: pip
 
       - name: Setup ctfcli
-        run: pip install ctfcli==0.1.0
-
-      - name: Load CTFd credentials
         run: |
+          pip install ctfcli==0.1.2
           mkdir .ctf
           cat <<EOF > .ctf/config
           [config]

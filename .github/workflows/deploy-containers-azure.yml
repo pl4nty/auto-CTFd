@@ -1,0 +1,96 @@
+name: Deploy containers to Azure
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - pwn/**
+      - web/**
+  workflow_dispatch:
+
+jobs:
+  main:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+
+      - uses: actions/setup-python@v5.0.0
+        with:
+          python-version: 3.x
+          cache: pip
+
+      - name: Setup ctfcli
+        run: |
+          pip install ctfcli==0.1.2
+          ctf plugins install https://github.com/pl4nty/ctfcli-deploy-azure.git
+
+          mkdir .ctf
+          cat <<EOF > .ctf/config
+          [config]
+          url = https://${{ vars.CTFD_DOMAIN }}
+          access_token = ${{ secrets.CTFD_TOKEN }}
+
+          [cookies]
+          site_password = ${{ secrets.CTFD_SITE_PASSWORD }}
+
+          [challenges]
+          EOF
+
+      # azure-identity doesn't support GitHub WIF
+      - uses: azure/login@cb79c773a3cfa27f31f25eb3f677781210c9ce3d # v1
+        with:
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          allow-no-subscriptions: true
+
+      - name: Setup Azure Container Registry
+        run: az acr login --name $REGISTRY
+        env:
+          REGISTRY: ${{ vars.REGISTRY }}
+
+      # TODO add buildx support to ctfcli
+      # https://github.com/jpribyl/action-docker-layer-caching/issues/38
+      - name: Setup Docker cache
+        uses: jpribyl/action-docker-layer-caching@v0.1.1
+        with:
+          key: docker-layer-cache-{hash}
+          restore-keys: |
+            docker-layer-cache-
+            layer-docker-layer-cache-
+
+      # ignore errors in case a challenge isn't deployable
+      - name: Deploy containers
+        run: |
+          shopt -s extglob
+          for chal in ?(pwn|web)/*/; do
+            ctf challenge deploy $chal --skip-login --host "azure://management.azure.com$AZURE_CONTAINER_ENV?registry=$REGISTRY&identity=$AZURE_CONTAINER_IDENTITY&suffix=$AZURE_CONTAINER_SUFFIX" || true
+          done
+        env:
+          REGISTRY: ${{ vars.REGISTRY }}
+          AZURE_CONTAINER_ENV: ${{ vars.AZURE_CONTAINER_ENV }}
+          AZURE_CONTAINER_IDENTITY: ${{ vars.AZURE_CONTAINER_IDENTITY }}
+          AZURE_CONTAINER_SUFFIX: ${{ vars.AZURE_CONTAINER_SUFFIX }}
+
+      - name: Setup GitHub container registry
+        uses: docker/login-action@v3.0.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
+
+      - name: Push container images to GitHub
+        run: |-
+          images=$(docker images $REGISTRY/*:latest --format "{{.Repository}}")
+          for image in $images; do
+            lowercase=${GITHUB_REPOSITORY_OWNER,,}
+            newtag=${image//$REGISTRY/ghcr\.io\/$lowercase}:latest
+            docker tag $image:latest $newtag
+            docker push $newtag
+          done
+        env:
+          REGISTRY: ${{ vars.REGISTRY }}
