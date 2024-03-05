@@ -15,17 +15,17 @@ jobs:
     steps:
       - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
 
-      - uses: actions/setup-python@v5.0.0
+      - uses: actions/setup-python@0a5c61591373683505ea898e09a3ea4f39ef2b9c # v5.0.0
         with:
           python-version: 3.x
           cache: pip
 
-      - uses: zentered/issue-forms-body-parser@v2.2.0
+      - uses: zentered/issue-forms-body-parser@93bd9fdcb3679be1889d2006e9c2cf496899402e # v2.2.0
         id: form
 
       - name: Slugify challenge name
         id: slugify
-        uses: rlespinasse/slugify-value@v1.4.0
+        uses: rlespinasse/slugify-value@a4879db1eb3db9bbee01dca36f98a8236c2b8239 # v1.4.0
         with:
           key: title
           value: ${{ github.event.issue.title }}
@@ -58,7 +58,7 @@ jobs:
           -D name="${{ github.event.issue.title }}"
           rm data.json
 
-      - uses: peter-evans/create-pull-request@v6.0.1
+      - uses: peter-evans/create-pull-request@a4f52f8033a6168103c2538976c07b467e8163bc # v6.0.1
         with:
           branch: patch-${{ github.event.issue.number }}
           title: ${{ env.title }}
@@ -67,7 +67,7 @@ jobs:
         env:
           title: "chals(${{ steps.chal.outputs.category }}): add ${{ steps.slugify.outputs.slug }}"
 
-      - uses: peter-evans/create-or-update-comment@v4.0.0
+      - uses: peter-evans/create-or-update-comment@71345be0265236311c031f5c7866368bd1eff043 # v4.0.0
         with:
           issue-number: ${{ github.event.issue.number }}
           body: |
