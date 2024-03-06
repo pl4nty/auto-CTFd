@@ -30,6 +30,7 @@ jobs:
       - name: Setup ctfcli
         run: |
           pip install ctfcli==0.1.2
+
           mkdir .ctf
           cat <<EOF > .ctf/config
           [config]
@@ -42,9 +43,10 @@ jobs:
           [challenges]
           EOF
 
-      - name: Deploy challenges
-        run: |
           shopt -s globstar
           for chal in **/challenge.yml; do
-            ctf challenge install $(dirname $chal) --force
+            echo "$chal = $chal" >> .ctf/config
           done
+
+      - name: Deploy challenges
+        run: ctf challenge install --force

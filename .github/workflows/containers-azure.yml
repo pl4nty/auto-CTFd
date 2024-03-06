@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+    # TODO match on regex instead
     paths:
       - pwn/**
       - web/**
@@ -41,17 +42,10 @@ jobs:
           [challenges]
           EOF
 
-      # azure-identity doesn't support GitHub WIF
-      - uses: azure/login@8c334a195cbb38e46038007b304988d888bf676a # v2
-        with:
-          tenant-id: ${{ vars.AZURE_TENANT_ID }}
-          client-id: ${{ vars.AZURE_CLIENT_ID }}
-          allow-no-subscriptions: true
-
-      - name: Setup Azure Container Registry
-        run: az acr login --name $REGISTRY
-        env:
-          REGISTRY: ${{ vars.REGISTRY }}
+          shopt -s extglob
+          for chal in ?(pwn|web)/*/; do
+            echo "$chal = $chal" >> .ctf/config
+          done
 
       # TODO add buildx support to ctfcli
       # https://github.com/jpribyl/action-docker-layer-caching/issues/38
@@ -63,18 +57,19 @@ jobs:
             docker-layer-cache-
             layer-docker-layer-cache-
 
-      # ignore errors in case a challenge isn't deployable
+      # azure-identity doesn't support GitHub WIF
+      - uses: azure/login@8c334a195cbb38e46038007b304988d888bf676a # v2
+        with:
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          allow-no-subscriptions: true
+
+      - name: Setup Azure Container Registry
+        run: az acr login --name ${{ vars.REGISTRY }}
+
+      # TODO raise issue, throws error even if target challenge isn't deployable. ignore all errors for now
       - name: Deploy containers
-        run: |
-          shopt -s extglob
-          for chal in ?(pwn|web)/*/; do
-            ctf challenge deploy $chal --skip-login --host "azure://management.azure.com$AZURE_CONTAINER_ENV?registry=$REGISTRY&identity=$AZURE_CONTAINER_IDENTITY&suffix=$AZURE_CONTAINER_SUFFIX" || true
-          done
-        env:
-          REGISTRY: ${{ vars.REGISTRY }}
-          AZURE_CONTAINER_ENV: ${{ vars.AZURE_CONTAINER_ENV }}
-          AZURE_CONTAINER_IDENTITY: ${{ vars.AZURE_CONTAINER_IDENTITY }}
-          AZURE_CONTAINER_SUFFIX: ${{ vars.AZURE_CONTAINER_SUFFIX }}
+        run: ctf challenge deploy --skip-login --host "azure://management.azure.com${{ vars.AZURE_CONTAINER_ENV }}?registry=${{ vars.REGISTRY }}&identity=${{ vars.AZURE_CONTAINER_IDENTITY }}&suffix=${{ vars.AZURE_CONTAINER_SUFFIX }}" || true
 
       - name: Setup GitHub container registry
         uses: docker/login-action@343f7c4344506bcbf9b4de18042ae17996df046d # v3.0.0

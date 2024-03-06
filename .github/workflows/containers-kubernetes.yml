@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+    # TODO match on regex instead
     paths:
       - pwn/**
       - web/**
@@ -30,7 +31,7 @@ jobs:
           curl -L https://github.com/kubernetes/kompose/releases/download/v1.32.0/kompose-linux-amd64 -o kompose
           chmod +x kompose
           sudo mv ./kompose /usr/local/bin/kompose
-          echo "$KUBE_CONFIG" > $HOME/.kube/config
+          echo "${{ secrets.KUBE_CONFIG }}" > $HOME/.kube/config
 
           mkdir .ctf
           cat <<EOF > .ctf/config
@@ -43,15 +44,11 @@ jobs:
 
           [challenges]
           EOF
-        env:
-          KUBE_CONFIG: ${{ secrets.KUBE_CONFIG }}
 
-      - name: Setup container registry
-        uses: docker/login-action@343f7c4344506bcbf9b4de18042ae17996df046d # v3.0.0
-        with:
-          registry: ${{ vars.REGISTRY}}
-          username: ${{ secrets.REGISTRY_USERNAME }}
-          password: ${{ secrets.REGISTRY_PASSWORD }}
+          shopt -s extglob
+          for chal in ?(pwn|web)/*/; do
+            echo "$chal = $chal" >> .ctf/config
+          done
 
       # TODO add buildx support to ctfcli
       # https://github.com/jpribyl/action-docker-layer-caching/issues/38
@@ -63,15 +60,16 @@ jobs:
             docker-layer-cache-
             layer-docker-layer-cache-
 
-      # ignore errors in case a challenge isn't deployable
+      - name: Setup container registry
+        uses: docker/login-action@343f7c4344506bcbf9b4de18042ae17996df046d # v3.0.0
+        with:
+          registry: ${{ vars.REGISTRY}}
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
+
+      # TODO raise issue, throws error even if target challenge isn't deployable. ignore all errors for now
       - name: Deploy containers
-        run: |
-          shopt -s extglob
-          for chal in ?(pwn|web)/*/; do
-            ctf challenge deploy $chal --skip-login --host "kubernetes://KUBE_HOST?registry=$REGISTRY" || true
-          done
-        env:
-          REGISTRY: ${{ vars.REGISTRY }}
+        run: ctf challenge deploy --skip-login --host "kubernetes://${{ vars.KUBE_HOST }}?registry=${{ vars.REGISTRY }}" || true
 
       - name: Setup GitHub container registry
         uses: docker/login-action@343f7c4344506bcbf9b4de18042ae17996df046d # v3.0.0
