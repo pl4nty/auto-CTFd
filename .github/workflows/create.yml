@@ -53,7 +53,7 @@ jobs:
       - name: Render challenge.yml
         run: |
           pip install jinja2-cli
-          jinja2 .github/challenge-template.jinja2 data.json \
+          jinja2 .github/challenge.jinja2 data.json \
           --outfile "${{ steps.chal.outputs.directory }}/challenge.yml" \
           -D name="${{ github.event.issue.title }}"
           rm data.json

@@ -1,5 +1,5 @@
 {
   "yaml.schemas": {
-    ".github/challenge-schema.yml": "**/challenge.yml"
+    ".github/schema.yml": "**/challenge.yml"
   }
 }
