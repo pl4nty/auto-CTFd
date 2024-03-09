@@ -2,12 +2,10 @@ name: Lint challenges
 
 on:
   push:
-    paths-ignore:
-      - .*/**
-      - .*
-      - LICENSE.txt
-      - README.md
-      - pages/**
+    paths:
+      - '*/**'
+      - '!.*/**'
+      - '!pages/**'
   workflow_dispatch:
 
 jobs:
@@ -25,7 +23,8 @@ jobs:
 
       - name: Setup ctfcli
         run: |
-          pip install ctfcli==0.1.2
+          pip install -r requirements.txt
+
           mkdir .ctf
           cat <<EOF > .ctf/config
           [config]

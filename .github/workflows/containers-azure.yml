@@ -27,7 +27,7 @@ jobs:
 
       - name: Setup ctfcli
         run: |
-          pip install ctfcli==0.1.2
+          pip install -r requirements.txt
           ctf plugins install https://github.com/pl4nty/ctfcli-deploy-azure.git
 
           mkdir .ctf
