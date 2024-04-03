@@ -1,0 +1,64 @@
+name: Test challenges
+
+on:
+  pull_request:
+    paths:
+      - '*/**'
+      - '!.*/**'
+      - '!pages/**'
+  workflow_dispatch:
+
+jobs:
+  main:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read # changed-files
+    steps:
+      - uses: tj-actions/changed-files@2d756ea4c53f7f6b397767d8723b3a10a9f35bf2 # v44.0.0
+        id: changed
+        with:
+          dir_names: true # output folders instead of files
+          dir_names_exclude_current_dir: true
+          dir_names_max_depth: 2 # return challenge root folders
+          files: '!.*/**' # assume noone modifies a challenge and pages in the same PR
+
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+
+      - uses: actions/setup-python@82c7e631bb3cdc910f68e0081d67478d79c6982d # v5.1.0
+        with:
+          python-version: 3.x
+          cache: pip
+
+      - name: Setup ctfcli
+        run: |
+          pip install -r requirements.txt
+
+          mkdir .ctf
+          cat <<EOF > .ctf/config
+          [config]
+          url = https://${{ vars.CTFD_DOMAIN }}
+          access_token = ${{ secrets.CTFD_TOKEN }}
+
+          [cookies]
+          site_password = ${{ secrets.CTFD_SITE_PASSWORD }}
+
+          [challenges]
+          EOF
+
+      - name: Lint challenges
+        run: |
+          shopt -s globstar
+          for chal in ${{ steps.changed.outputs.all_changed_and_modified_files }}; do
+            ctf challenge lint $chal --flag_format=${{ vars.FLAG_PREFIX || 'ctf{' }}}
+          done
+
+      # TODO support custom connection_info in ctfcli healthcheck
+      - name: Test challenges
+        run: |
+          shopt -s globstar
+          root=$(pwd)
+          for chal in ${{ steps.changed.outputs.all_changed_and_modified_files }}; do
+            cd $root/$chal
+            eval $(ctf challenge show . | grep -oP 'healthcheck:\s*\K.*')
+          done
