@@ -64,6 +64,7 @@ jobs:
           title: ${{ env.title }}
           body: "Closes #${{ github.event.issue.number }}"
           commit-message: ${{ env.title }}
+          sign-commits: true
         env:
           title: "chals(${{ steps.chal.outputs.category }}): add ${{ steps.slugify.outputs.slug }}"
 
