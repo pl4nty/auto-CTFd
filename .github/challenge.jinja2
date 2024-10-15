@@ -1,7 +1,7 @@
 name: {{ name }}
 author: {{ author }}
 category: {{ category }}
-description: >-
+description: |
   {{ description | indent(width=2) }}
 type: dynamic
 
@@ -10,21 +10,16 @@ extra:
   decay: 4
   function: linear
   minimum: 100
-
 {% if image != '*No response*' %}
 image: {{ image }}
 protocol: {{ 'https' if category == 'web' else 'tcp' }}
-
 {% endif %}
 flags:
 - type: static
   data: case_insensitive
   content: {{ flag }}
-
-{% if files != '*No response*' %}
-{% set filelist = files.split(',') %}
+{% if files != '*No response*' %}{% set filelist = files.split(',') %}
 files:
 - {{ filelist | join('\n- ') }}
-
 {% endif %}
-version: "0.1"
+version: '0.1'
