@@ -45,19 +45,20 @@ jobs:
             echo "$chal = $chal" >> .ctf/config
           done
 
-      # TODO add buildx support to ctfcli
-      # https://github.com/jpribyl/action-docker-layer-caching/issues/38
-      - name: Setup Docker cache
-        uses: jpribyl/action-docker-layer-caching@c632825d12ec837065f49726ea27ddd40bcc7894 # v0.1.1
-        with:
-          key: docker-layer-cache-{hash}
-          restore-keys: |
-            docker-layer-cache-
-            layer-docker-layer-cache-
-
+      - uses: docker/setup-buildx-action@v3
+      - name: Get auth params for buildx cache
+        uses: crazy-max/ghaction-github-runtime@v3
       # TODO raise issue, throws error even if target challenge isn't deployable. ignore all errors for now
       - name: Deploy containers
-        run: ctf challenge deploy || true
+        run: |
+          docker() {
+            if [ "$1" = "build" ]; then
+              command docker buildx build --cache-from type=gha --cache-to type=gha,mode=max "${@:2}"
+            else
+              command docker "$@"
+            fi
+          }
+          ctf challenge deploy || true
 
       - name: Setup GitHub container registry
         uses: docker/login-action@9780b0c442fbb1117ed29e0efdff1e18412f7567 # v3.3.0
