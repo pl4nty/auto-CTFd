@@ -47,15 +47,18 @@ jobs:
             echo "$chal = $chal" >> .ctf/config
           done
 
-      # TODO add buildx support to ctfcli
-      # https://github.com/jpribyl/action-docker-layer-caching/issues/38
-      - name: Setup Docker cache
-        uses: jpribyl/action-docker-layer-caching@c632825d12ec837065f49726ea27ddd40bcc7894 # v0.1.1
-        with:
-          key: docker-layer-cache-{hash}
-          restore-keys: |
-            docker-layer-cache-
-            layer-docker-layer-cache-
+      - uses: docker/setup-buildx-action@v3
+      - name: Add cache parameters to docker build
+        run: |
+          cat <<EOF > /tmp/rcfile
+          docker() {
+            if [ "$1" = "build" ]; then
+              command docker build --cache-from type=gha --cache-to type=gha,mode=max "${@:2}"
+            else
+              command docker "$@"
+            fi
+          }
+          EOF
 
       # azure-identity doesn't support GitHub WIF
       - uses: azure/login@a65d910e8af852a8061c627c456678983e180302 # v2
@@ -69,7 +72,9 @@ jobs:
 
       # TODO raise issue, throws error even if target challenge isn't deployable. ignore all errors for now
       - name: Deploy containers
-        run: ctf challenge deploy --skip-login --host "azure://management.azure.com${{ vars.AZURE_CONTAINER_ENV }}?registry=${{ vars.REGISTRY }}&identity=${{ vars.AZURE_CONTAINER_IDENTITY }}&suffix=${{ vars.AZURE_CONTAINER_SUFFIX }}" || true
+        run: |
+          source /tmp/rcfile
+          ctf challenge deploy --skip-login --host "azure://management.azure.com${{ vars.AZURE_CONTAINER_ENV }}?registry=${{ vars.REGISTRY }}&identity=${{ vars.AZURE_CONTAINER_IDENTITY }}&suffix=${{ vars.AZURE_CONTAINER_SUFFIX }}" || true
 
       - name: Setup GitHub container registry
         uses: docker/login-action@9780b0c442fbb1117ed29e0efdff1e18412f7567 # v3.3.0
