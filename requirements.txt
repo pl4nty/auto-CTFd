@@ -1,1 +1,1 @@
-ctfcli==0.1.3
+ctfcli @ git+https://github.com/CTFd/ctfcli.git

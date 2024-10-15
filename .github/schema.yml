@@ -19,6 +19,8 @@ properties:
     type: string
   description:
     type: string
+  attribution:
+    type: string
   value:
     type: integer
     minimum: 0
