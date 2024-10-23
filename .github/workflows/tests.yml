@@ -23,7 +23,7 @@ jobs:
           dir_names_max_depth: 2 # return challenge root folders
           files: "!.*/**" # assume noone modifies a challenge and pages in the same PR
 
-      - uses: actions/checkout@v4.2.1
+      - uses: actions/checkout@v4.2.2
 
       - uses: actions/setup-python@v5.2.0
         with:
