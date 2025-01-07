@@ -1,0 +1,115 @@
+name: Deploy containers to kCTF
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  changes:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: write
+    steps:
+      - uses: actions/checkout@v4.2.2
+        with:
+          fetch-depth: 2
+
+      - name: Get changed challenges
+        id: changed-files
+        uses: tj-actions/changed-files@v45
+        with:
+          dir_names: true
+          dir_names_max_depth: 2
+          dir_names_exclude_current_dir: true
+
+      - name: Skip if no changes to container challenges
+        env:
+          ALL_CHANGED_FILES: ${{ steps.changed-files.outputs.all_changed_files }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          changed=false
+          for file in ${ALL_CHANGED_FILES}; do
+            if [ -f "$file/challenge.yaml" ]; then
+              changed=true
+              break
+            fi
+          done
+          if [ "$changed" = false ]; then
+            gh run cancel ${{ github.run_id }}
+            gh run watch ${{ github.run_id }}
+          fi
+
+  main:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+    needs: changes
+    steps:
+      - uses: actions/checkout@v4.2.2
+
+      - uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.KCTF_IDENTITY }}
+      - uses: google-github-actions/get-gke-credentials@v2
+        with:
+          cluster_name: ${{ vars.KCTF_CLUSTER_NAME }}
+          location: ${{ vars.KCTF_ZONE }}
+      - name: Setup container registry
+        run: |
+          gcloud auth configure-docker
+
+      # based on https://github.com/google/kctf/blob/5d0f830d6adae029322570601f145a1866a50669/.github/workflows/update-images.yaml#L295C5-L329C13
+      - name: Deploy containers
+        env:
+          CLUSTER_NAME: stub
+        run: |
+          source kctf/activate
+          for template in */*/; do
+            pushd $template
+              if [[ ! -e "challenge.yaml" ]]; then
+                continue
+              fi
+              if [[ -e "challenge/Makefile" ]]; then
+                make -C "challenge"
+              fi
+              CHALLENGE_NAME="$("${KCTF_BIN}/yq" eval '.metadata.name' challenge.yaml)"
+              echo "starting challenge ${CHALLENGE_NAME}"
+              kctf chal start
+              echo "challenge started, waiting for it to become available"
+              # We want to wait for the deployment to be available, but it
+              # might not have been created yet by the operator and wait will fail.
+              # So try to "kubectl get" the challenge a few times to make sure it exists.
+              # Ideally, we would expose the condition in the operator but I
+              # don't think that's currently possible.
+              for i in {1..5}; do
+                kubectl get "deployment/${CHALLENGE_NAME}" && break
+                echo "deployment/${CHALLENGE_NAME} doesn't exist yet, sleeping"
+                sleep 5
+              done
+              kubectl wait --for=condition=available --timeout=5m "deployment/${CHALLENGE_NAME}"
+            popd
+          done
+
+      - name: Setup GitHub container registry
+        uses: docker/login-action@v3.3.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
+
+      - name: Push container images to GitHub
+        run: |-
+          images=$(docker images $REGISTRY/*:latest --format "{{.Repository}}")
+          for image in $images; do
+            lowercase=${GITHUB_REPOSITORY_OWNER,,}
+            newtag=${image//$REGISTRY/ghcr\.io\/$lowercase}:latest
+            docker tag $image:latest $newtag
+            docker push $newtag
+          done
+        env:
+          REGISTRY: ${{ vars.REGISTRY }}

@@ -101,3 +101,16 @@ Create the following variables:
 | `AZURE_CONTAINER_ENV` | Container Apps enviroment [resource ID](https://learn.microsoft.com/en-us/azure/storage/common/storage-account-get-info?tabs=portal#get-the-resource-id-for-a-storage-account) |
 | `AZURE_CONTAINER_IDENTITY` | Managed identity resource ID |
 | `AZURE_CONTAINER_SUFFIX` | Container Apps environment DNS suffix, eg chals.example.com |
+
+### Google kCTF
+
+1. [Set up kCTF infrastructure](https://google.github.io/kctf/google-cloud.html) and open the config file `kctf/config/.lastconfig`
+2. [Create a Workload Identity Provider](https://github.com/google-github-actions/auth#preferred-direct-workload-identity-federation) and copy its resource name
+3. Create the following variables:
+
+| Name | Value |
+| ---- | ----- |
+| `REGISTRY` | Container registry from the config file |
+| `KCTF_CLUSTER_NAME` | Cluster name from the config file |
+| `KCTF_ZONE` | Zone from the config file |
+| `KCTF_IDENTITY` | Workload Identity Provider resource name |
