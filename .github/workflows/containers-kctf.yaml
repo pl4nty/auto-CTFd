@@ -21,8 +21,8 @@ jobs:
           curl -sSL https://kctf.dev/sdk | tar xz
 
           mkdir kctf/config
-          printf '%s' '${{ vars.KCTF_CONFIG }}' > kctf/config/.lastconfig
-          . kctf/config/.lastconfig
+          echo "${{ vars.KCTF_CONFIG }}" | tr '\n' ' ' > kctf/config/.lastconfig
+          source kctf/config/.lastconfig
           echo "KCTF_CLUSTER=projects/$PROJECT/locations/$ZONE/clusters/$CLUSTER_NAME" >> $GITHUB_ENV
           echo "REGISTRY=$REGISTRY" >> $GITHUB_ENV
 
@@ -37,6 +37,8 @@ jobs:
 
       # based on https://github.com/google/kctf/blob/5d0f830d6adae029322570601f145a1866a50669/.github/workflows/update-images.yaml#L295C5-L329C13
       - name: Deploy containers
+        env:
+          CLUSTER_NAME: stub
         run: |
           docker() {
             if [ "$1" = "build" ]; then
