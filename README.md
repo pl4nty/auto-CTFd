@@ -1,6 +1,6 @@
 # Auto CTFd
 
-Automatically deploy your CTF challenges from GitHub to CTFd. Also supports containerised challenges on managed CTFd, Kubernetes, and Microsoft Azure.
+Automatically deploy your CTF challenges from GitHub to CTFd. Also supports containerised challenges on managed CTFd, Kubernetes, Microsoft Azure, or Google's kCTF.
 
 ## Requirements
 
