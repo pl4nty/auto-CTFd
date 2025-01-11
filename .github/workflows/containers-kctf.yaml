@@ -36,7 +36,9 @@ jobs:
           mv /tmp/kctf-3976fdec31aeabc10d41dfeaa2337f0a789f6698/dist kctf
           source kctf/activate
 
-          docker context rm default
+          docker buildx ls
+          docker context ls
+          docker buildx use ${{ steps.buildkit.outputs.name }}
           docker() {
             if [ "$1" = "build" ]; then
               command docker buildx build --cache-from type=gha --cache-to type=gha,mode=max "${@:2}" --builder ${{ steps.buildkit.outputs.name }}
