@@ -36,16 +36,7 @@ jobs:
           mv /tmp/kctf-3976fdec31aeabc10d41dfeaa2337f0a789f6698/dist kctf
           source kctf/activate
 
-          docker buildx ls
-          docker buildx use ${{ steps.buildkit.outputs.name }} --debug --global
-          docker buildx ls
-          docker() {
-            if [ "$1" = "build" ]; then
-              command docker buildx build --cache-from type=gha --cache-to type=gha,mode=max "${@:2}" --builder ${{ steps.buildkit.outputs.name }}
-            else
-              command docker "$@"
-            fi
-          }
+          sed -i 's/docker build/docker build --cache-from type=gha --cache-to type=gha,mode=max --builder ${{ steps.buildkit.outputs.name }}/' kctf/bin/kctf-challenge
           mkdir kctf/config
           echo "${{ vars.KCTF_CONFIG }}" | tr '\r\n' '\n' > kctf/config/kctf-cluster
           source kctf/config/kctf-cluster
