@@ -39,7 +39,9 @@ jobs:
           ${{ vars.KCTF_CONFIG }}
           EOF
           source kctf/config/kctf-cluster
-          gcloud auth configure-docker $REGISTRY
+          cat kctf/config/kctf-cluster
+          gcloud auth configure-docker
+          echo "${{ vars.KCTF_CONFIG }}"
           kctf cluster load kctf-cluster
 
           shopt -s extglob
