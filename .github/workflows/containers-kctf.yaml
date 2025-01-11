@@ -1,0 +1,92 @@
+name: Deploy containers to kCTF
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  # based on https://github.com/google/kctf/blob/5d0f830d6adae029322570601f145a1866a50669/.github/workflows/update-images.yaml#L205
+  main:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+      packages: write
+    steps:
+      - uses: actions/checkout@v4.2.2
+
+      - uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.KCTF_IDENTITY }}
+      - uses: google-github-actions/setup-gcloud@v2
+        with:
+          install_components: gke-gcloud-auth-plugin
+
+      - uses: docker/setup-buildx-action@v3.8.0
+        id: buildkit
+      - name: Get auth params for buildx cache
+        uses: crazy-max/ghaction-github-runtime@v3.0.0
+
+      - name: Deploy containers
+        # Artefact Registry support https://github.com/google/kctf/pull/406
+        # have to --push for cache to hit https://github.com/moby/buildkit/issues/2887
+        run: |
+          curl -sSL https://github.com/HlynurOskar/kctf/archive/3976fdec31aeabc10d41dfeaa2337f0a789f6698.tar.gz | tar xz -C /tmp
+          mv /tmp/kctf-3976fdec31aeabc10d41dfeaa2337f0a789f6698/dist kctf
+          source kctf/activate
+
+          sed -i 's|docker build|docker build --load --cache-from type=gha,scope=${CHALLENGE_NAME}-${CONTAINER_NAME} --cache-to type=gha,mode=max,scope=${CHALLENGE_NAME}-${CONTAINER_NAME} --builder ${{ steps.buildkit.outputs.name }}|' kctf/bin/kctf-challenge
+          sed -i 's|IMAGE_URL="$.*|IMAGE_URL="${REGISTRY}/${PROJECT}/${CLUSTER_NAME}/${CHALLENGE_NAME}-${IMAGE_NAME}:${IMAGE_ID}"|' kctf/bin/kctf-challenge
+          mkdir kctf/config
+          echo "${{ vars.KCTF_CONFIG }}" | tr '\r\n' '\n' > kctf/config/kctf-cluster
+          source kctf/config/kctf-cluster
+          gcloud auth configure-docker $REGISTRY
+          kctf cluster load kctf-cluster
+
+          shopt -s extglob
+          for template in !(kctf)/*/; do
+            pushd $template
+              if [[ ! -e "challenge.yaml" ]]; then
+                continue
+              fi
+              if [[ -e "challenge/Makefile" ]]; then
+                make -C "challenge"
+              fi
+              CHALLENGE_NAME="$("${KCTF_BIN}/yq" eval '.metadata.name' challenge.yaml)"
+              echo "starting challenge ${CHALLENGE_NAME}"
+              kctf chal start
+              echo "challenge started, waiting for it to become available"
+              # We want to wait for the deployment to be available, but it
+              # might not have been created yet by the operator and wait will fail.
+              # So try to "kubectl get" the challenge a few times to make sure it exists.
+              # Ideally, we would expose the condition in the operator but I
+              # don't think that's currently possible.
+              for i in {1..5}; do
+                kubectl get "deployment/${CHALLENGE_NAME}" && break
+                echo "deployment/${CHALLENGE_NAME} doesn't exist yet, sleeping"
+                sleep 5
+              done
+              kubectl wait --for=condition=available --timeout=5m "deployment/${CHALLENGE_NAME}"
+            popd
+          done
+
+      - name: Setup GitHub container registry
+        uses: docker/login-action@v3.3.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
+
+      - name: Push container images to GitHub
+        run: |-
+          source kctf/config/kctf-cluster
+
+          images=$(docker images $REGISTRY/*:latest --format "{{.Repository}}")
+          for image in $images; do
+            lowercase=${GITHUB_REPOSITORY_OWNER,,}
+            newtag=${image//$REGISTRY/ghcr\.io\/$lowercase}:latest
+            docker tag $image:latest $newtag
+            docker push $newtag
+          done

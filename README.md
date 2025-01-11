@@ -12,14 +12,14 @@ Automatically deploy your CTF challenges from GitHub to CTFd. Also supports cont
 
 1. [Click here](https://github.com/new?template_name=auto-ctfd&template_owner=pl4nty) to create a repository for your CTF. Select "Private" to prevent public access
 2. [Allow GitHub Actions to create pull requests](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/enabling-features-for-your-repository/managing-github-actions-settings-for-a-repository#preventing-github-actions-from-creating-or-approving-pull-requests)
-3. [Create the following secrets](https://docs.github.com/en/actions/security-guides/encrypted-secrets#creating-encrypted-secrets-for-a-repository):
+3. [Create the following secrets](https://docs.github.com/en/actions/security-guides/encrypted-secrets#creating-encrypted-secrets-for-a-repository)
 
 | Name | Value |
 | ---- | ----- |
 | `CTFD_TOKEN` | [CTFd admin access token](https://docs.ctfd.io/docs/api/getting-started#generating-an-admin-access-token) |
 | `CTFD_SITE_PASSWORD` (optional) | [CTFd site password](https://docs.ctfd.io/hosted/security/setting-site-password), if enabled |
 
-4. [Create the following variables](https://docs.github.com/en/actions/learn-github-actions/variables#creating-configuration-variables-for-a-repository):
+4. [Create the following variables](https://docs.github.com/en/actions/learn-github-actions/variables#creating-configuration-variables-for-a-repository)
 
 | Name | Value |
 | ---- | ----- |
@@ -53,7 +53,7 @@ Some challenges, like pwn or web, may need to run services in containers. These 
 
 Note that managed CTFd has certain Dockerfile requirements and limitations. Please see the [CTFd documentation](https://docs.ctfd.io/tutorials/challenges/deploying-challenges) for more details.
 
-Create the following variables:
+Create the following variables
 
 | Name | Value |
 | ---- | ----- |
@@ -63,14 +63,14 @@ Create the following variables:
 
 1. Add a Compose file like `docker-compose.yml` to each of your challenge(s)
 2. Ensure TCP challenges have unique ports
-3. Create the following variables:
+3. Create the following variables
 
 | Name | Value |
 | ---- | ----- |
 | `REGISTRY` | A container registry accessible by the Kubernetes cluster |
 | `KUBE_HOST` | Hostname for challenges. HTTP challenges will be available via ingress on `example.KUBE_HOST`, and TCP challenges via load balancer service on `KUBE_HOST:port` |
 
-4. Create the following secrets:
+4. Create the following secrets
 
 | Name | Value |
 | ---- | ----- |
@@ -91,7 +91,7 @@ Create the following variables:
 4. [Create a user-assigned managed identity](https://learn.microsoft.com/en-us/entra/identity/managed-identities-azure-resources/how-manage-user-assigned-managed-identities#create-a-user-assigned-managed-identity) and
 5. [Create an Azure Container Registry](https://learn.microsoft.com/en-us/azure/container-registry/container-registry-get-started-portal) and assign the `AcrPull` role on it to the managed identity
 6. (Optional) [Add a custom DNS suffix](https://learn.microsoft.com/en-us/azure/container-apps/environment-custom-dns-suffix) to the Container Apps environment
-6. Create the following variables:
+6. Create the following variables
 
 | Name | Value |
 | ---- | ----- |
@@ -101,3 +101,34 @@ Create the following variables:
 | `AZURE_CONTAINER_ENV` | Container Apps enviroment [resource ID](https://learn.microsoft.com/en-us/azure/storage/common/storage-account-get-info?tabs=portal#get-the-resource-id-for-a-storage-account) |
 | `AZURE_CONTAINER_IDENTITY` | Managed identity resource ID |
 | `AZURE_CONTAINER_SUFFIX` | Container Apps environment DNS suffix, eg chals.example.com |
+
+### Google kCTF
+
+1. [Set up kCTF infrastructure](https://google.github.io/kctf/google-cloud.html)
+2. [Create a Workload Identity Pool and Provider](https://github.com/google-github-actions/auth#preferred-direct-workload-identity-federation)
+3. Grant Kubernetes Engine Developer and Artifact Registry Writer roles to the Pool
+
+```sh
+# TODO: replace ${PROJECT_ID}, ${WORKLOAD_IDENTITY_POOL_ID}, and ${REPO}
+# with your values below.
+#
+# ${REPO} is the full repo name including the parent GitHub organization,
+# such as "my-org/my-repo".
+#
+# ${WORKLOAD_IDENTITY_POOL_ID} is the full pool id, such as
+# "projects/123456789/locations/global/workloadIdentityPools/github".
+
+gcloud projects add-iam-policy-binding "${PROJECT_ID}" \
+  --role="roles/container.developer" \
+  --member="principalSet://iam.googleapis.com/${WORKLOAD_IDENTITY_POOL_ID}/attribute.repository/${REPO}"
+gcloud projects add-iam-policy-binding "${PROJECT_ID}" \
+  --role="roles/artifactregistry.writer" \
+  --member="principalSet://iam.googleapis.com/${WORKLOAD_IDENTITY_POOL_ID}/attribute.repository/${REPO}"
+```
+
+4. Create the following variables
+
+| Name | Value |
+| ---- | ----- |
+| `KCTF_CONFIG` | Contents of the kCTF config file `kctf/config/.lastconfig` |
+| `KCTF_IDENTITY` | Workload Identity Provider resource name |
