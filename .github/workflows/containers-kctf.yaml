@@ -5,54 +5,14 @@ on:
     branches:
       - main
   workflow_dispatch:
-    inputs:
-      targets:
-        description: Target folder names as newline-separated list
-        type: string
 
 jobs:
-  changes:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      actions: write
-    steps:
-      - uses: actions/checkout@v4.2.2
-        with:
-          fetch-depth: 2
-
-      - name: Get changed challenges
-        id: changed-files
-        uses: tj-actions/changed-files@v45
-        with:
-          dir_names: true
-          dir_names_max_depth: 2
-          dir_names_exclude_current_dir: true
-
-      - name: Skip if no changes to container challenges
-        env:
-          ALL_CHANGED_FILES: ${{ github.event_name == 'workflow_dispatch' && inputs.targets || steps.changed-files.outputs.all_changed_files }}
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          changed=false
-          for file in ${ALL_CHANGED_FILES}; do
-            if [ -f "$file/challenge.yaml" ]; then
-              changed=true
-              break
-            fi
-          done
-          if [ "$changed" = false ]; then
-            gh run cancel ${{ github.run_id }}
-            gh run watch ${{ github.run_id }}
-          fi
-
   main:
     runs-on: ubuntu-latest
     permissions:
       contents: read
       packages: write
       id-token: write
-    needs: changes
     steps:
       - uses: actions/checkout@v4.2.2
 
@@ -63,16 +23,13 @@ jobs:
         with:
           cluster_name: ${{ vars.KCTF_CLUSTER }}
       - name: Setup container registry
-        run: |
-          gcloud auth configure-docker
+        run: gcloud auth configure-docker ${{ vars.REGISTRY }}
 
       # based on https://github.com/google/kctf/blob/5d0f830d6adae029322570601f145a1866a50669/.github/workflows/update-images.yaml#L295C5-L329C13
       - name: Deploy containers
-        env:
-          CLUSTER_NAME: stub
         run: |
-          curl -sSL https://kctf.dev/sdk | tar xz
-          source kctf/activate
+          curl -sSL https://kctf.dev/sdk | tar xz -C /tmp
+          source /tmp/kctf/activate
           for template in */*/; do
             pushd $template
               if [[ ! -e "challenge.yaml" ]]; then
