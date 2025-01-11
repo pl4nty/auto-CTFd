@@ -36,7 +36,7 @@ jobs:
           mv /tmp/kctf-3976fdec31aeabc10d41dfeaa2337f0a789f6698/dist kctf
           source kctf/activate
 
-          sed -i 's|docker build|docker build --push --tag "${REGISTRY}/${PROJECT}/${CLUSTER_NAME}/${CHALLENGE_NAME}-${IMAGE_NAME}:${IMAGE_ID}" --cache-from type=gha --cache-to type=gha,mode=max --builder ${{ steps.buildkit.outputs.name }}|' kctf/bin/kctf-challenge
+          sed -i 's|docker build|docker build --push --tag "${REGISTRY}/${PROJECT}/${CLUSTER_NAME}/${CHALLENGE_NAME}-${CONTAINER_NAME}" --cache-from type=gha --cache-to type=gha,mode=max --builder ${{ steps.buildkit.outputs.name }}|' kctf/bin/kctf-challenge
           sed -i 's/push_images || return//' kctf/bin/kctf-challenge
           mkdir kctf/config
           echo "${{ vars.KCTF_CONFIG }}" | tr '\r\n' '\n' > kctf/config/kctf-cluster
