@@ -39,8 +39,7 @@ jobs:
             fi
           }
           mkdir kctf/config
-          echo "$KCTF_CONFIG" | tr '\n' ' '
-          echo "$KCTF_CONFIG" | tr '\n' ' ' > kctf/config/kctf-cluster
+          echo "$KCTF_CONFIG" | tr '\r\n' ' ' > kctf/config/kctf-cluster
           cat kctf/config/kctf-cluster
           source kctf/config/kctf-cluster
           gcloud auth configure-docker
