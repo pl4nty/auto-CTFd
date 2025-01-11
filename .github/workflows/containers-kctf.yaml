@@ -23,13 +23,10 @@ jobs:
       - uses: google-github-actions/setup-gcloud@v2
 
       - name: Deploy containers
-        env:
-          CLUSTER_NAME: stub
         run: |
           curl -sSL https://kctf.dev/sdk | tar xz
           source kctf/activate
 
-          gcloud auth configure-docker
           docker() {
             if [ "$1" = "build" ]; then
               command docker buildx build --cache-from type=gha --cache-to type=gha,mode=max "${@:2}"
@@ -38,7 +35,11 @@ jobs:
             fi
           }
           mkdir kctf/config
-          printf '%s' '${{ vars.KCTF_CONFIG }}' > kctf/config/kctf-cluster
+          cat <<EOF > kctf/config/kctf-cluster
+          ${{ vars.KCTF_CONFIG }}
+          EOF
+          source kctf/config/kctf-cluster
+          gcloud auth configure-docker $REGISTRY
           kctf cluster load kctf-cluster
 
           shopt -s extglob
