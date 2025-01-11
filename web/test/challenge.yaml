@@ -8,8 +8,8 @@ spec:
   network:
     public: true
     ports:
-    - protocol: "HTTPS"
-      targetPort: 1337
+      - protocol: "HTTPS"
+        targetPort: 1337
   healthcheck:
     # TIP: disable the healthcheck during development
     enabled: true
