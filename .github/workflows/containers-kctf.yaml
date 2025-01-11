@@ -26,7 +26,7 @@ jobs:
 
       - name: Deploy containers
         env:
-          KCTF_CONFIG: ${{ env.KCTF_CONFIG }}
+          KCTF_CONFIG: ${{ vars.KCTF_CONFIG }}
         run: |
           curl -sSL https://kctf.dev/sdk | tar xz
           source kctf/activate
