@@ -25,6 +25,8 @@ jobs:
           install_components: gke-gcloud-auth-plugin
 
       - name: Deploy containers
+        env:
+          KCTF_CONFIG: ${{ env.KCTF_CONFIG }}
         run: |
           curl -sSL https://kctf.dev/sdk | tar xz
           source kctf/activate
@@ -37,7 +39,7 @@ jobs:
             fi
           }
           mkdir kctf/config
-          echo "${{ vars.KCTF_CONFIG }}" | tr '\n' ' ' > kctf/config/kctf-cluster
+          echo "$KCTF_CONFIG" > kctf/config/kctf-cluster
           source kctf/config/kctf-cluster
           cat kctf/config/kctf-cluster
           gcloud auth configure-docker
