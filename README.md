@@ -98,7 +98,7 @@ Create the following variables
 | `REGISTRY` | A container registry accessible by the Container Apps environment |
 | `AZURE_TENANT_ID` | App registration tenant ID |
 | `AZURE_CLIENT_ID` | App registration client ID |
-| `AZURE_CONTAINER_ENV` | Container Apps enviroment [resource ID](https://learn.microsoft.com/en-us/azure/storage/common/storage-account-get-info?tabs=portal#get-the-resource-id-for-a-storage-account) |
+| `AZURE_CONTAINER_ENV` | Container Apps environment [resource ID](https://learn.microsoft.com/en-us/azure/storage/common/storage-account-get-info?tabs=portal#get-the-resource-id-for-a-storage-account) |
 | `AZURE_CONTAINER_IDENTITY` | Managed identity resource ID |
 | `AZURE_CONTAINER_SUFFIX` | Container Apps environment DNS suffix, eg chals.example.com |
 
