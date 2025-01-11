@@ -71,6 +71,7 @@ jobs:
         env:
           CLUSTER_NAME: stub
         run: |
+          curl -sSL https://kctf.dev/sdk | tar xz
           source kctf/activate
           for template in */*/; do
             pushd $template
