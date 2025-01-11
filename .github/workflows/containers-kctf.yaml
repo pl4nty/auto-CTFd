@@ -31,9 +31,10 @@ jobs:
           # otherwise kCTF will require a config file, even though it's not needed for chal start
           CLUSTER_NAME: stub
         run: |
-          curl -sSL https://kctf.dev/sdk | tar xz -C /tmp
-          source /tmp/kctf/activate
-          for template in */*/; do
+          curl -sSL https://kctf.dev/sdk | tar xz
+          source kctf/activate
+          shopt -s extglob
+          for template in !(kctf)/*/; do
             pushd $template
               if [[ ! -e "challenge.yaml" ]]; then
                 continue
