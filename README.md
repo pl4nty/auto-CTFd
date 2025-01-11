@@ -105,8 +105,9 @@ Create the following variables
 ### Google kCTF
 
 1. [Set up kCTF infrastructure](https://google.github.io/kctf/google-cloud.html)
-2. [Create a Workload Identity Pool and Provider](https://github.com/google-github-actions/auth#preferred-direct-workload-identity-federation)
-3. Grant Kubernetes Engine Developer and Artifact Registry Writer roles to the Pool
+2. [Create a Docker Artefact Registry](https://cloud.google.com/artifact-registry/docs/docker/store-docker-container-images#create) with the same name as the GKE cluster (pending https://github.com/google/kctf/pull/406)
+3. [Create a Workload Identity Pool and Provider](https://github.com/google-github-actions/auth#preferred-direct-workload-identity-federation)
+4. Grant Kubernetes Engine Developer and Artifact Registry Writer roles to the Pool
 
 ```sh
 # TODO: replace ${PROJECT_ID}, ${WORKLOAD_IDENTITY_POOL_ID}, and ${REPO}
