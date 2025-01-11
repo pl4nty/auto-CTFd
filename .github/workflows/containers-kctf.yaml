@@ -34,11 +34,9 @@ jobs:
           curl -sSL https://kctf.dev/sdk | tar xz
           source kctf/activate
 
-          docker buildx use ${{ steps.buildkit.outputs.name }}
-          docker buildx ls
           docker() {
             if [ "$1" = "build" ]; then
-              command docker buildx build --cache-from type=gha --cache-to type=gha,mode=max "${@:2}"
+              command docker buildx build --cache-from type=gha --cache-to type=gha,mode=max "${@:2}" --builder ${{ steps.buildkit.outputs.name }}
             else
               command docker "$@"
             fi
