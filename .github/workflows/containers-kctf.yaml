@@ -27,6 +27,9 @@ jobs:
 
       # based on https://github.com/google/kctf/blob/5d0f830d6adae029322570601f145a1866a50669/.github/workflows/update-images.yaml#L295C5-L329C13
       - name: Deploy containers
+        env:
+          # otherwise kCTF will require a config file, even though it's not needed for chal start
+          CLUSTER_NAME: stub
         run: |
           curl -sSL https://kctf.dev/sdk | tar xz -C /tmp
           source /tmp/kctf/activate
