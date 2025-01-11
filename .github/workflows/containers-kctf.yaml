@@ -25,6 +25,7 @@ jobs:
           install_components: gke-gcloud-auth-plugin
 
       - uses: docker/setup-buildx-action@v3.8.0
+        id: buildkit
       - name: Get auth params for buildx cache
         uses: crazy-max/ghaction-github-runtime@v3.0.0
 
@@ -35,6 +36,7 @@ jobs:
           mv /tmp/kctf-3976fdec31aeabc10d41dfeaa2337f0a789f6698/dist kctf
           source kctf/activate
 
+          docker buildx use ${{ steps.buildkit.outputs.name }}
           docker() {
             if [ "$1" = "build" ]; then
               command docker buildx build --cache-from type=gha --cache-to type=gha,mode=max "${@:2}"
