@@ -104,7 +104,7 @@ Create the following variables
 
 ### Google kCTF
 
-1. [Set up kCTF infrastructure](https://google.github.io/kctf/google-cloud.html) and open the config file `kctf/config/.lastconfig`
+1. [Set up kCTF infrastructure](https://google.github.io/kctf/google-cloud.html)
 2. [Create a Workload Identity Pool and Provider](https://github.com/google-github-actions/auth#preferred-direct-workload-identity-federation)
 3. Grant Kubernetes Engine Developer and Artifact Registry Writer roles to the Pool
 
@@ -130,6 +130,5 @@ gcloud projects add-iam-policy-binding "${PROJECT_ID}" \
 
 | Name | Value |
 | ---- | ----- |
-| `REGISTRY` | Container registry from the config file |
-| `KCTF_CLUSTER` | Cluster resource name, using variables from the config file in the format `projects/PROJECT/locations/ZONE/clusters/CLUSTER_NAME` |
+| `KCTF_CONFIG` | Contents of the kCTF config file `kctf/config/.lastconfig` |
 | `KCTF_IDENTITY` | Workload Identity Provider resource name |
