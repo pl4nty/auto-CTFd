@@ -30,8 +30,10 @@ jobs:
         uses: crazy-max/ghaction-github-runtime@v3.0.0
 
       - name: Deploy containers
+        # Artefact Registry support https://github.com/google/kctf/pull/406
         run: |
-          curl -sSL https://kctf.dev/sdk | tar xz
+          curl -sSL https://github.com/HlynurOskar/kctf/archive/3976fdec31aeabc10d41dfeaa2337f0a789f6698.tar.gz | tar xz -C /tmp
+          mv /tmp/kctf-3976fdec31aeabc10d41dfeaa2337f0a789f6698/dist kctf
           source kctf/activate
 
           docker() {
