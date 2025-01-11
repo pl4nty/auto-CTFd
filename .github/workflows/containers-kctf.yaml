@@ -61,8 +61,7 @@ jobs:
           workload_identity_provider: ${{ vars.KCTF_IDENTITY }}
       - uses: google-github-actions/get-gke-credentials@v2
         with:
-          cluster_name: ${{ vars.KCTF_CLUSTER_NAME }}
-          location: ${{ vars.KCTF_ZONE }}
+          cluster_name: ${{ vars.KCTF_CLUSTER }}
       - name: Setup container registry
         run: |
           gcloud auth configure-docker

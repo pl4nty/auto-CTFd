@@ -131,6 +131,5 @@ gcloud projects add-iam-policy-binding "${PROJECT_ID}" \
 | Name | Value |
 | ---- | ----- |
 | `REGISTRY` | Container registry from the config file |
-| `KCTF_CLUSTER_NAME` | Cluster name from the config file |
-| `KCTF_ZONE` | Zone from the config file |
+| `KCTF_CLUSTER` | Cluster resource name, using variables from the config file in the format `projects/PROJECT/locations/ZONE/clusters/CLUSTER_NAME` |
 | `KCTF_IDENTITY` | Workload Identity Provider resource name |
