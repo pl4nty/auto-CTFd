@@ -7,39 +7,29 @@ on:
   workflow_dispatch:
 
 jobs:
+  # based on https://github.com/google/kctf/blob/5d0f830d6adae029322570601f145a1866a50669/.github/workflows/update-images.yaml#L205
   main:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      packages: write
       id-token: write
+      packages: write
     steps:
       - uses: actions/checkout@v4.2.2
-
-      - name: Setup kCTF
-        run: |
-          curl -sSL https://kctf.dev/sdk | tar xz
-
-          mkdir kctf/config
-          echo "${{ vars.KCTF_CONFIG }}" | tr '\n' ' ' | tr -s ' ' > kctf/config/.lastconfig
-          source kctf/config/.lastconfig
-          echo "KCTF_CLUSTER=projects/$PROJECT/locations/$ZONE/clusters/$CLUSTER_NAME" >> $GITHUB_ENV
-          echo "REGISTRY=$REGISTRY" >> $GITHUB_ENV
 
       - uses: google-github-actions/auth@v2
         with:
           workload_identity_provider: ${{ vars.KCTF_IDENTITY }}
-      - uses: google-github-actions/get-gke-credentials@v2
-        with:
-          cluster_name: ${{ env.KCTF_CLUSTER }}
-      - name: Setup container registry
-        run: gcloud auth configure-docker ${{ env.REGISTRY }}
+      - uses: google-github-actions/setup-gcloud@v2
 
-      # based on https://github.com/google/kctf/blob/5d0f830d6adae029322570601f145a1866a50669/.github/workflows/update-images.yaml#L295C5-L329C13
       - name: Deploy containers
         env:
           CLUSTER_NAME: stub
         run: |
+          curl -sSL https://kctf.dev/sdk | tar xz
+          source kctf/activate
+
+          gcloud auth configure-docker
           docker() {
             if [ "$1" = "build" ]; then
               command docker buildx build --cache-from type=gha --cache-to type=gha,mode=max "${@:2}"
@@ -47,8 +37,10 @@ jobs:
               command docker "$@"
             fi
           }
+          mkdir kctf/config
+          printf '%s' '${{ vars.KCTF_CONFIG }}' > kctf/config/kctf-cluster
+          kctf cluster load kctf-cluster
 
-          source kctf/activate
           shopt -s extglob
           for template in !(kctf)/*/; do
             pushd $template
@@ -85,6 +77,8 @@ jobs:
 
       - name: Push container images to GitHub
         run: |-
+          source kctf/config/.lastconfig
+
           images=$(docker images $REGISTRY/*:latest --format "{{.Repository}}")
           for image in $images; do
             lowercase=${GITHUB_REPOSITORY_OWNER,,}
