@@ -30,13 +30,12 @@ jobs:
         uses: crazy-max/ghaction-github-runtime@v3.0.0
 
       - name: Deploy containers
-        # Artefact Registry support https://github.com/google/kctf/pull/406
         run: |
-          curl -sSL https://github.com/HlynurOskar/kctf/archive/3976fdec31aeabc10d41dfeaa2337f0a789f6698.tar.gz | tar xz -C /tmp
-          mv /tmp/kctf-3976fdec31aeabc10d41dfeaa2337f0a789f6698/dist kctf
+          curl -sSL https://kctf.dev/sdk | tar xz
           source kctf/activate
 
           docker buildx use ${{ steps.buildkit.outputs.name }}
+          docker buildx ls
           docker() {
             if [ "$1" = "build" ]; then
               command docker buildx build --cache-from type=gha --cache-to type=gha,mode=max "${@:2}"
