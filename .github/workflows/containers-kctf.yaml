@@ -37,8 +37,8 @@ jobs:
           source kctf/activate
 
           docker buildx ls
-          docker context ls
-          docker buildx use ${{ steps.buildkit.outputs.name }}
+          docker buildx use ${{ steps.buildkit.outputs.name }} --debug --global
+          docker buildx ls
           docker() {
             if [ "$1" = "build" ]; then
               command docker buildx build --cache-from type=gha --cache-to type=gha,mode=max "${@:2}" --builder ${{ steps.buildkit.outputs.name }}
