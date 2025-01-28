@@ -20,7 +20,7 @@ jobs:
       - name: Checkout
         uses: connorjclark/action-cached-lfs-checkout@main-1
 
-      - uses: actions/setup-python@v5.3.0
+      - uses: actions/setup-python@v5.4.0
         with:
           python-version: 3.x
           cache: pip
