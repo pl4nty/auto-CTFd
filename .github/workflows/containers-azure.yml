@@ -57,7 +57,7 @@ jobs:
       - name: Setup Azure Container Registry
         run: az acr login --name ${{ vars.REGISTRY }}
 
-      - uses: docker/setup-buildx-action@v3.8.0
+      - uses: docker/setup-buildx-action@v3.9.0
       - name: Get auth params for buildx cache
         uses: crazy-max/ghaction-github-runtime@v3.0.0
       # TODO raise issue, throws error even if target challenge isn't deployable. ignore all errors for now
