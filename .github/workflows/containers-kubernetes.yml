@@ -52,7 +52,7 @@ jobs:
           done
 
       - name: Setup container registry
-        uses: docker/login-action@v3.3.0
+        uses: docker/login-action@v3.4.0
         with:
           registry: ${{ vars.REGISTRY}}
           username: ${{ secrets.REGISTRY_USERNAME }}
@@ -74,7 +74,7 @@ jobs:
           ctf challenge deploy --skip-login --host "kubernetes://${{ vars.KUBE_HOST }}?registry=${{ vars.REGISTRY }}" || true
 
       - name: Setup GitHub container registry
-        uses: docker/login-action@v3.3.0
+        uses: docker/login-action@v3.4.0
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
