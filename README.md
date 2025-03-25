@@ -5,7 +5,7 @@ Automatically deploy your CTF challenges from GitHub to CTFd. Also supports cont
 ## Requirements
 
 * A [managed](https://docs.ctfd.io/hosted/management/creating-hosted-instances) or [self-hosted](https://docs.ctfd.io/docs/deployment/installation/) CTFd instance
-  * An education discount is available for managed instances. [Contact support](https://ctfd.io/contact) for more details.
+  * An 80% education discount is available for managed instances. [Contact support](https://ctfd.io/contact) for more details.
 * [GitHub account](https://github.com/join) for each challenge author. Consider [GitHub Education](https://education.github.com/benefits) if you're eligible
 
 ## Getting Started
