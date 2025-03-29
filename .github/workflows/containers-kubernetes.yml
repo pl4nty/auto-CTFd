@@ -60,7 +60,7 @@ jobs:
 
       - uses: docker/setup-buildx-action@v3.10.0
       - name: Get auth params for buildx cache
-        uses: crazy-max/ghaction-github-runtime@v3.0.0
+        uses: crazy-max/ghaction-github-runtime@v3.1.0
       # TODO raise issue, throws error even if target challenge isn't deployable. ignore all errors for now
       - name: Deploy containers
         run: |
