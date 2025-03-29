@@ -27,7 +27,7 @@ jobs:
       - uses: docker/setup-buildx-action@v3.10.0
         id: buildkit
       - name: Get auth params for buildx cache
-        uses: crazy-max/ghaction-github-runtime@v3.0.0
+        uses: crazy-max/ghaction-github-runtime@v3.1.0
 
       - name: Deploy containers
         # Artefact Registry support https://github.com/google/kctf/pull/406
