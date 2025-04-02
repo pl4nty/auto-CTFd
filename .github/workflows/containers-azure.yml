@@ -48,7 +48,7 @@ jobs:
           done
 
       # azure-identity doesn't support GitHub WIF
-      - uses: azure/login@v2.2.0
+      - uses: azure/login@v2.3.0
         with:
           tenant-id: ${{ vars.AZURE_TENANT_ID }}
           client-id: ${{ vars.AZURE_CLIENT_ID }}
