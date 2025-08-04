@@ -73,7 +73,7 @@ jobs:
           ctf challenge deploy --skip-login --host "azure://management.azure.com${{ vars.AZURE_CONTAINER_ENV }}?registry=${{ vars.REGISTRY }}&identity=${{ vars.AZURE_CONTAINER_IDENTITY }}&suffix=${{ vars.AZURE_CONTAINER_SUFFIX }}" || true
 
       - name: Setup GitHub container registry
-        uses: docker/login-action@v3.4.0
+        uses: docker/login-action@v3.5.0
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
