@@ -15,7 +15,7 @@ jobs:
       id-token: write
       packages: write
     steps:
-      - uses: actions/checkout@v4.3.0
+      - uses: actions/checkout@v5.0.0
 
       - uses: google-github-actions/auth@v2
         with:
