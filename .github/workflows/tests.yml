@@ -15,7 +15,7 @@ jobs:
       contents: read
       pull-requests: read # changed-files
     steps:
-      - uses: tj-actions/changed-files@v46.0.5
+      - uses: tj-actions/changed-files@v47.0.1
         id: changed
         with:
           dir_names: true # output folders instead of files
