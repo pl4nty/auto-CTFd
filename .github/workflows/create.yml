@@ -4,9 +4,12 @@ on:
   issues:
     types:
       - opened
+      - edited
 
 jobs:
   main:
+    # rerun automation on edits, but only by trusted users to limit git history noise
+    if: github.event.action == 'opened' || github.actor == github.repository_owner
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write
