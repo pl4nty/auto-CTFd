@@ -1,2 +1,13 @@
 .ctf/
 .devcontainer/
+venv/
+.env
+.DS_Store
+__pycache__
+.vs
+bin
+obj
+packages
+publish
+dist
+node_modules

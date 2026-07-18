@@ -105,6 +105,8 @@ properties:
       - type: string
       - type: object
         properties:
+          title:
+            type: string
           content:
             type: string
           cost:
@@ -112,9 +114,20 @@ properties:
             minimum: 0
 
   requirements:
-    type: array
-    items:
-      type: string
+    oneOf:
+    - type: array
+      items:
+        type: string
+    - type: object
+      properties:
+        prerequisites:
+          type: array
+          items:
+            type: string
+        anonymize:
+          type: boolean
+  next:
+    type: string
 
   state:
     type: string

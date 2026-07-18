@@ -20,7 +20,13 @@ body:
   - type: input
     attributes:
       label: Author
-      description: Supports markdown
+      description: Name or username for players to see
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: Email
+      description: Only used if the organisers need to contact you. Please note, this email address will be visible to challenge authors and reviewers
     validations:
       required: true
   - type: textarea
@@ -48,7 +54,7 @@ body:
   - type: textarea
     attributes:
       label: Writeup
-      placeholder: Describe the intended solution to your challenge here. Avoid using markdown subtitles (##)
+      placeholder: Describe the intended solution to your challenge here. Please don't use markdown headings, it breaks the automation (sorry!)
     validations:
       required: true
   - type: checkboxes

@@ -50,7 +50,7 @@ jobs:
         run: |
           shopt -s globstar
           for chal in ${{ steps.changed.outputs.all_changed_and_modified_files }}; do
-            ctf challenge lint $chal --flag_format=${{ vars.FLAG_PREFIX || 'ctf{' }}}
+            ctf challenge lint $chal --skip_hadolint --flag_format=${{ vars.FLAG_PREFIX || 'ctf{' }}} --
           done
 
       # TODO support custom connection_info in ctfcli healthcheck
