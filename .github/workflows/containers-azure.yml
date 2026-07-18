@@ -20,7 +20,7 @@ jobs:
     steps:
       - uses: actions/checkout@v5.0.1
 
-      - uses: actions/setup-python@v5.6.0
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
         with:
           python-version: 3.x
           cache: pip
