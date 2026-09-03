@@ -18,7 +18,7 @@ jobs:
     steps:
       # pending https://github.com/nschloe/action-cached-lfs-checkout/pull/34
       - name: Checkout
-        uses: connorjclark/action-cached-lfs-checkout@main-1
+        uses: connorjclark/action-cached-lfs-checkout@f082d118c76ebb8e100c35719e76b86866146f9d # main-1
 
       - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
         with:

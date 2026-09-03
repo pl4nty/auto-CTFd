@@ -28,7 +28,7 @@ jobs:
 
       - name: Slugify challenge name
         id: slugify
-        uses: rlespinasse/slugify-value@v1.4.0
+        uses: rlespinasse/slugify-value@a4879db1eb3db9bbee01dca36f98a8236c2b8239 # v1.4.0
         with:
           key: title
           value: ${{ github.event.issue.title }}
