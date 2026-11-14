@@ -23,7 +23,7 @@ jobs:
           python-version: 3.x
           cache: pip
 
-      - uses: zentered/issue-forms-body-parser@3dc7e926aa8e97596968cc8117801514d6c081bd # v3.0.0
+      - uses: zentered/issue-forms-body-parser@a7db4c3c4e511df2d1f1b32de4bb6311b8ad52f8 # v3.0.1
         id: form
 
       - name: Slugify challenge name
