@@ -3,7 +3,6 @@
   "extends": [
     "github>pl4nty/.github"
   ],
-  "additionalBranchPrefix": "{{parentDir}}-",
   "ignoreTests": true,
   "packageRules": [
     {
